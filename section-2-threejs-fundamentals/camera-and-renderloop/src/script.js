@@ -24,8 +24,12 @@ scene.add(camera);
 const canvas = document.getElementById("threejs");
 const renderer = new THREE.WebGLRenderer({
   canvas,
+  // one solution to fix aliasing
+  antialias: true,
 });
 renderer.setSize(window.innerWidth, window.innerHeight);
+// Another solution to fix aliasing is to use device pixel ratio and just render more pixels
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
 const controls = new OrbitControls(camera, canvas);
 controls.enableDamping = true;
