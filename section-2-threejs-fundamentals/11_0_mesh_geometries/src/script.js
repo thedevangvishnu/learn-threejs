@@ -5,11 +5,18 @@ import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 const scene = new THREE.Scene();
 
 // add objects to the scene
-const cubeGeometry = new THREE.BoxGeometry(1, 1, 1);
-const cubeMaterial = new THREE.MeshBasicMaterial({ color: "red", wireframe: true });
-const cubeMesh = new THREE.Mesh(cubeGeometry, cubeMaterial);
+const geometry = new THREE.SphereGeometry(1, 32, 20);
+
+const cubeMaterial = new THREE.MeshBasicMaterial({
+  color: "red",
+  wireframe: true,
+});
+const cubeMesh = new THREE.Mesh(geometry, cubeMaterial);
 
 scene.add(cubeMesh);
+
+const axes = new THREE.AxesHelper(4);
+scene.add(axes);
 
 // initialize the camera
 const camera = new THREE.PerspectiveCamera(
@@ -18,7 +25,7 @@ const camera = new THREE.PerspectiveCamera(
   0.1,
   200
 );
-camera.position.z = 5;
+camera.position.z = 10;
 
 // initialize the renderer
 const canvas = document.querySelector("canvas.threejs");
@@ -32,7 +39,7 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 // instantiate the controls
 const controls = new OrbitControls(camera, canvas);
 controls.enableDamping = true;
-controls.autoRotate = true;
+// controls.autoRotate = true;
 
 window.addEventListener("resize", () => {
   camera.aspect = window.innerWidth / window.innerHeight;
