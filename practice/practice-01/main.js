@@ -5,8 +5,8 @@ const scene = new THREE.Scene();
 
 const cubeGeometry = new THREE.BoxGeometry(1, 1, 1, 2, 2, 2);
 const cubeMaterial = new THREE.MeshBasicMaterial({
-  color: "yellow",
-  wireframe: true,
+  color: "blue",
+  // wireframe: true,
 });
 const cubeMesh = new THREE.Mesh(cubeGeometry, cubeMaterial);
 cubeMesh.position.y = 1;
@@ -15,12 +15,22 @@ scene.add(cubeMesh);
 // cone mesh
 const coneGeometry = new THREE.ConeGeometry(0.5, 1, 32);
 const coneMaterial = new THREE.MeshBasicMaterial({
-  color: "brown",
+  color: "red",
   wireframe: true,
 });
 const coneMesh = new THREE.Mesh(coneGeometry, coneMaterial);
 coneMesh.position.set(2, 2, 0);
 scene.add(coneMesh);
+
+const planeGeometry = new THREE.PlaneGeometry(8, 8);
+const planeMaterial = new THREE.MeshBasicMaterial({
+  color: "gray",
+  // wireframe: true,
+  side: THREE.DoubleSide,
+});
+const planeMesh = new THREE.Mesh(planeGeometry, planeMaterial);
+planeMesh.rotation.x = Math.PI * 0.5;
+scene.add(planeMesh);
 
 const camera = new THREE.PerspectiveCamera(
   75,
@@ -28,10 +38,11 @@ const camera = new THREE.PerspectiveCamera(
   0.1,
   20
 );
-camera.position.z = 6;
+camera.position.set(2, 4, 8);
+
 scene.add(camera);
 
-const axes = new THREE.AxesHelper(3);
+const axes = new THREE.AxesHelper(4);
 scene.add(axes);
 
 const canvas = document.getElementById("threejs");
@@ -60,6 +71,8 @@ const renderLoop = () => {
 
   // add animation
   cubeMesh.rotation.y += THREE.MathUtils.degToRad(1) * delta * 30;
+
+  coneMesh.rotation.z += THREE.MathUtils.degToRad(1) * delta * 30;
   renderer.render(scene, camera);
 
   // requestAnimationFrame() is the browser api that optimizes the animation loop (the specified function, in this case, the renderLoop()) for displaying smooth animations based on browser's frame rate and display refresh rate
