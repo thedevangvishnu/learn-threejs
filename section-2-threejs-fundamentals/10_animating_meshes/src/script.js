@@ -6,7 +6,10 @@ const scene = new THREE.Scene();
 
 // add objects to the scene
 const cubeGeometry = new THREE.BoxGeometry(1, 1, 1);
-const cubeMaterial = new THREE.MeshBasicMaterial({ color: "red", wireframe: true });
+const cubeMaterial = new THREE.MeshBasicMaterial({
+  color: "yellow",
+  wireframe: true,
+});
 const cubeMesh = new THREE.Mesh(cubeGeometry, cubeMaterial);
 
 scene.add(cubeMesh);
@@ -18,7 +21,7 @@ const camera = new THREE.PerspectiveCamera(
   0.1,
   200
 );
-camera.position.z = 5;
+camera.position.z = 10;
 
 // initialize the renderer
 const canvas = document.querySelector("canvas.threejs");
@@ -40,8 +43,23 @@ window.addEventListener("resize", () => {
   renderer.setSize(window.innerWidth, window.innerHeight);
 });
 
+const axes = new THREE.AxesHelper(4);
+scene.add(axes);
+
+// initialize the clock
+const clock = new THREE.Clock();
+let previousTime = 0;
+
 // render the scene
 const renderloop = () => {
+  const currentTime = clock.getElapsedTime();
+  const delta = currentTime - previousTime;
+
+  previousTime = currentTime;
+
+  cubeMesh.rotation.y += THREE.MathUtils.degToRad(1) * delta * 30;
+  cubeMesh.scale.y = Math.sin(currentTime) + 2;
+
   controls.update();
   renderer.render(scene, camera);
   window.requestAnimationFrame(renderloop);
