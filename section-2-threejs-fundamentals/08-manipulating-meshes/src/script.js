@@ -6,7 +6,10 @@ const scene = new THREE.Scene();
 
 // add objects to the scene
 const cubeGeometry = new THREE.BoxGeometry(1, 1, 1);
-const cubeMaterial = new THREE.MeshBasicMaterial({ color: "red" });
+const cubeMaterial = new THREE.MeshBasicMaterial({
+  color: "yellow",
+  wireframe: true,
+});
 
 const cubeMesh = new THREE.Mesh(cubeGeometry, cubeMaterial);
 const cubeMesh2 = new THREE.Mesh(cubeGeometry, cubeMaterial);
@@ -15,8 +18,25 @@ const cubeMesh3 = new THREE.Mesh(cubeGeometry, cubeMaterial);
 cubeMesh2.position.x = 2;
 cubeMesh3.position.x = -2;
 
-cubeMesh.scale.y = 0.5;
-cubeMesh.position.y = -1;
+cubeMesh.position.y = 2;
+
+cubeMesh.rotation.reorder("YXZ");
+
+// rotation is in anti-clock motion
+
+// cubeMesh.rotation.x = 0;
+cubeMesh.rotation.y = THREE.MathUtils.degToRad(90); // Math.PI is 180 deg
+cubeMesh.rotation.x = THREE.MathUtils.degToRad(45);
+
+// let i = 0;
+// setInterval(() => {
+//   cubeMesh.rotation.y = i;
+
+//   setInterval(() => {
+//     cubeMesh.rotation.x = i;
+//   }, 3000);
+//   i++;
+// }, 2000);
 
 const group = new THREE.Group();
 
@@ -24,8 +44,7 @@ group.add(cubeMesh);
 group.add(cubeMesh2);
 group.add(cubeMesh3);
 
-group.position.y = 2;
-group.scale.y = 2;
+group.position.y = 1;
 
 scene.add(group);
 
@@ -42,8 +61,12 @@ const camera = new THREE.PerspectiveCamera(
 camera.position.z = 15;
 
 // add axes helper
-const axes = new THREE.AxesHelper(5);
-scene.add(axes);
+const axes = new THREE.AxesHelper(2);
+const sceneAxes = new THREE.AxesHelper(4);
+scene.add(sceneAxes);
+
+// add the axes helper relative to cubeMesh
+cubeMesh.add(axes);
 
 // initialize the renderer
 const canvas = document.querySelector("canvas.threejs");
