@@ -12,13 +12,30 @@ const scene = new THREE.Scene();
 const geometry = new THREE.BoxGeometry(1, 1, 1);
 
 // initialize the material
-const material = new THREE.MeshBasicMaterial({
-  color: 0x00ff00,
-});
+const material = new THREE.MeshBasicMaterial();
+
+material.color = new THREE.Color("red");
+// material.transparent = true;
+// material.opacity = 0.6;
+material.side = THREE.DoubleSide;
 
 // initialize the mesh
 const mesh = new THREE.Mesh(geometry, material);
+const mesh2 = new THREE.Mesh(geometry, material);
+mesh2.position.x = 2;
 scene.add(mesh);
+scene.add(mesh2);
+
+const plane = new THREE.PlaneGeometry(1, 1);
+const mesh3 = new THREE.Mesh(plane, material);
+mesh3.position.x = -2;
+scene.add(mesh3);
+
+scene.background = new THREE.Color("white");
+
+// initialize the fog
+const fog = new THREE.Fog("white", 3, 15);
+scene.fog = fog;
 
 // initialize the camera
 const camera = new THREE.PerspectiveCamera(
@@ -27,7 +44,7 @@ const camera = new THREE.PerspectiveCamera(
   0.1,
   200
 );
-camera.position.z = 5;
+camera.position.z = 8;
 
 // initialize the renderer
 const canvas = document.querySelector("canvas.threejs");
