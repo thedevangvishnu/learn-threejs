@@ -10,6 +10,11 @@ const scene = new THREE.Scene();
 
 // initialize the geometry
 const sphereGeometry = new THREE.SphereGeometry(0.5, 32, 32);
+const uv2Geometry = new THREE.BufferAttribute(
+  sphereGeometry.attributes.uv.array,
+  2
+);
+sphereGeometry.setAttribute("uv2", uv2Geometry);
 
 // initialize the texture loaders
 const textureLoader = new THREE.TextureLoader();
@@ -81,7 +86,27 @@ grassMaterial.metalnessMap = grassMetallic;
 grassMaterial.roughnessMap = grassRoughness;
 grassMaterial.normalMap = grassNormal;
 grassMaterial.displacementMap = grassHeight;
+grassMaterial.displacementScale = 0.1;
 grassMaterial.aoMap = grassAo;
+
+// grass pane
+const grassPane = pane.addFolder({
+  title: "Grass Material",
+  expanded: false,
+});
+
+grassPane.addInput(grassMaterial, "metalness", { min: 0, max: 1, step: 0.01 });
+grassPane.addInput(grassMaterial, "roughness", { min: 0, max: 1, step: 0.01 });
+grassPane.addInput(grassMaterial, "displacementScale", {
+  min: 0,
+  max: 1,
+  step: 0.01,
+});
+grassPane.addInput(grassMaterial, "aoMapIntensity", {
+  min: 0,
+  max: 1,
+  step: 0.01,
+});
 
 // space cruise map
 const spaceCruiseMaterial = new THREE.MeshStandardMaterial();
@@ -90,7 +115,34 @@ spaceCruiseMaterial.metalnessMap = spaceCruiseMetallic;
 spaceCruiseMaterial.roughnessMap = spaceCruiseRoughness;
 spaceCruiseMaterial.normalMap = spaceCruiseNormal;
 spaceCruiseMaterial.displacementMap = spaceCruiseHeight;
+spaceCruiseMaterial.displacementScale = 0.1;
 spaceCruiseMaterial.aoMap = spaceCruiseAo;
+
+const spaceCruisePane = pane.addFolder({
+  title: "Space Cruise Material",
+  expanded: false,
+});
+
+spaceCruisePane.addInput(spaceCruiseMaterial, "metalness", {
+  min: 0,
+  max: 1,
+  step: 0.01,
+});
+spaceCruisePane.addInput(spaceCruiseMaterial, "roughness", {
+  min: 0,
+  max: 1,
+  step: 0.01,
+});
+spaceCruisePane.addInput(spaceCruiseMaterial, "displacementScale", {
+  min: 0,
+  max: 1,
+  step: 0.01,
+});
+spaceCruisePane.addInput(spaceCruiseMaterial, "aoMapIntensity", {
+  min: 0,
+  max: 1,
+  step: 0.01,
+});
 
 // boulder map
 const bouldersMaterial = new THREE.MeshStandardMaterial();
@@ -99,16 +151,44 @@ bouldersMaterial.metalnessMap = bouldersMetallic;
 bouldersMaterial.roughnessMap = bouldersRoughness;
 bouldersMaterial.normalMap = bouldersNormal;
 bouldersMaterial.displacementMap = bouldersHeight;
+bouldersMaterial.displacementScale = 0.1;
 bouldersMaterial.aoMap = bouldersAo;
+
+// boulders pane
+const bouldersPane = pane.addFolder({
+  title: "Boulder Material",
+  expanded: false,
+});
+
+bouldersPane.addInput(bouldersMaterial, "metalness", {
+  min: 0,
+  max: 1,
+  step: 0.01,
+});
+bouldersPane.addInput(bouldersMaterial, "roughness", {
+  min: 0,
+  max: 1,
+  step: 0.01,
+});
+bouldersPane.addInput(bouldersMaterial, "displacementScale", {
+  min: 0,
+  max: 1,
+  step: 0.01,
+});
+bouldersPane.addInput(bouldersMaterial, "aoMapIntensity", {
+  min: 0,
+  max: 1,
+  step: 0.01,
+});
 
 // initialize mesh
 const grassSphere = new THREE.Mesh(sphereGeometry, grassMaterial);
 
 const spaceCruiseSphere = new THREE.Mesh(sphereGeometry, spaceCruiseMaterial);
-spaceCruiseSphere.position.x = -2;
+spaceCruiseSphere.position.x = -1.5;
 
 const bouldersSphere = new THREE.Mesh(sphereGeometry, bouldersMaterial);
-bouldersSphere.position.x = 2;
+bouldersSphere.position.x = 1.5;
 
 // add the mesh to the scene/group
 const group = new THREE.Group();
