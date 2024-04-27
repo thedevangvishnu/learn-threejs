@@ -21,6 +21,7 @@ camera.position.z = 5;
 scene.add(camera);
 
 const canvas = document.getElementById("threejs");
+console.log(canvas);
 
 const renderer = new THREE.WebGLRenderer({
   canvas,
