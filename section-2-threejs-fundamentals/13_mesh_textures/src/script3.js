@@ -9,7 +9,7 @@ const pane = new Pane();
 const scene = new THREE.Scene();
 
 // initialize the geometry
-const sphereGeometry = new THREE.SphereGeometry(0.5, 32, 32);
+const sphereGeometry = new THREE.SphereGeometry(0.6, 32, 32);
 const uv2Geometry = new THREE.BufferAttribute(
   sphereGeometry.attributes.uv.array,
   2
@@ -86,13 +86,13 @@ grassMaterial.metalnessMap = grassMetallic;
 grassMaterial.roughnessMap = grassRoughness;
 grassMaterial.normalMap = grassNormal;
 grassMaterial.displacementMap = grassHeight;
-grassMaterial.displacementScale = 0.1;
+grassMaterial.displacementScale = 0.05;
 grassMaterial.aoMap = grassAo;
 
 // grass pane
 const grassPane = pane.addFolder({
   title: "Grass Material",
-  expanded: false,
+  expanded: true,
 });
 
 grassPane.addInput(grassMaterial, "metalness", { min: 0, max: 1, step: 0.01 });
@@ -115,12 +115,12 @@ spaceCruiseMaterial.metalnessMap = spaceCruiseMetallic;
 spaceCruiseMaterial.roughnessMap = spaceCruiseRoughness;
 spaceCruiseMaterial.normalMap = spaceCruiseNormal;
 spaceCruiseMaterial.displacementMap = spaceCruiseHeight;
-spaceCruiseMaterial.displacementScale = 0.1;
+spaceCruiseMaterial.displacementScale = 0.05;
 spaceCruiseMaterial.aoMap = spaceCruiseAo;
 
 const spaceCruisePane = pane.addFolder({
   title: "Space Cruise Material",
-  expanded: false,
+  expanded: true,
 });
 
 spaceCruisePane.addInput(spaceCruiseMaterial, "metalness", {
@@ -157,7 +157,7 @@ bouldersMaterial.aoMap = bouldersAo;
 // boulders pane
 const bouldersPane = pane.addFolder({
   title: "Boulder Material",
-  expanded: false,
+  expanded: true,
 });
 
 bouldersPane.addInput(bouldersMaterial, "metalness", {
@@ -183,12 +183,13 @@ bouldersPane.addInput(bouldersMaterial, "aoMapIntensity", {
 
 // initialize mesh
 const grassSphere = new THREE.Mesh(sphereGeometry, grassMaterial);
+grassSphere.position.set(-1.9, 0.7, 0);
 
 const spaceCruiseSphere = new THREE.Mesh(sphereGeometry, spaceCruiseMaterial);
-spaceCruiseSphere.position.x = -1.5;
+spaceCruiseSphere.position.set(0, 0.7, 0);
 
 const bouldersSphere = new THREE.Mesh(sphereGeometry, bouldersMaterial);
-bouldersSphere.position.x = 1.5;
+bouldersSphere.position.set(-1, -0.7, 0);
 
 // add the mesh to the scene/group
 const group = new THREE.Group();
@@ -240,6 +241,10 @@ const renderloop = () => {
   //     child.rotation.y += 0.02;
   //   }
   // });
+
+  group.children.forEach((child) => {
+    child.rotation.y += 0.01;
+  });
 
   controls.update();
   renderer.render(scene, camera);
