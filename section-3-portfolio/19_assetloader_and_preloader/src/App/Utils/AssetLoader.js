@@ -16,7 +16,7 @@ export default class AssetLoader {
     dracoLoader.setDecoderPath("/draco/");
 
     this.gltfLoader = new GLTFLoader();
-    gltfLoader.setDRACOLoader(dracoLoader);
+    this.gltfLoader.setDRACOLoader(dracoLoader);
 
     this.textureLoader = new THREE.TextureLoader();
   }
