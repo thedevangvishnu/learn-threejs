@@ -1,17 +1,10 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import App from "./App";
-import Canvas from "./Canvas";
-
-let camera = null;
 
 export default class Camera {
   constructor() {
-    if (camera) return camera;
-
-    camera = this;
-
-    this.canvas = new Canvas();
+    this.app = new App();
     this.setInstance();
     this.setControls();
     this.loop();
@@ -19,15 +12,17 @@ export default class Camera {
 
   setInstance() {
     this.instance = new THREE.PerspectiveCamera(
-      35,
+      75,
       window.innerWidth / window.innerHeight,
       0.1,
-      200
+      400
     );
+
+    this.instance.position.z = 8;
   }
 
   setControls() {
-    this.controls = new OrbitControls(this.instance, this.canvas.instance);
+    this.controls = new OrbitControls(this.instance, this.app.canvas);
     this.controls.enableDamping = true;
   }
 

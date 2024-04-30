@@ -1,24 +1,15 @@
 import * as THREE from "three";
-import Scene from "../Scene";
-
-let world = null;
+import App from "../App";
 
 export default class World {
   constructor() {
-    if (world) return world;
+    this.app = new App();
 
-    world = this;
-    this.scene = new Scene();
-    this.setInstance();
-  }
-
-  setInstance() {
-    const sphereMesh = new THREE.Mesh(
-      new THREE.SphereGeometry(1, 32, 32),
+    const cube = new THREE.Mesh(
+      new THREE.BoxGeometry(2, 2, 2),
       new THREE.MeshBasicMaterial({ color: "yellow" })
     );
 
-    this.scene.instance.add(sphereMesh);
-    // console.log(this.scene.instance);
+    this.app.scene.add(cube);
   }
 }
