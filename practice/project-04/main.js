@@ -25,7 +25,9 @@ scene.add(sun);
 const createPlanet = (planet) => {
   const planetMesh = new THREE.Mesh(geometry, planet.material);
   planetMesh.scale.setScalar(planet.radius);
-  planetMesh.position.x = planet.distance;
+  planetMesh.position.x = planet.position.x;
+  planetMesh.position.z = planet.position.z;
+
   return planetMesh;
 };
 
@@ -45,8 +47,11 @@ const planetsMeshes = planets.map((planet) => {
   });
 
   scene.add(planetMesh);
+
   return planetMesh;
 });
+
+console.log(planetsMeshes[5]);
 
 // add ring to saturn
 const ringGeometry = new THREE.RingGeometry(1.5, 2);
@@ -56,20 +61,21 @@ const ringMaterial = new THREE.MeshStandardMaterial({
 });
 const ringMesh = new THREE.Mesh(ringGeometry, ringMaterial);
 
-ringMesh.rotation.x = Math.PI * 0.6;
-ringMesh.rotation.y = Math.PI * 0.2;
+ringMesh.rotation.x = -(Math.PI * 0.6);
+ringMesh.rotation.y = -(Math.PI * 0.2);
 const saturn = planetsMeshes[5];
+ringMesh.name = "Saturn Ring";
 saturn.add(ringMesh);
-console.log(saturn);
+console.log(ringMesh);
 
 ////////////////////////////////////////////////////////////////////
 
 // lights
 
-const ambientLight = new THREE.AmbientLight("white", 0.05);
+const ambientLight = new THREE.AmbientLight("white", 0.1);
 scene.add(ambientLight);
 
-const pointLight = new THREE.PointLight("white", 1500);
+const pointLight = new THREE.PointLight("white", 1800);
 scene.add(pointLight);
 
 ////////////////////////////////////////////////////////////////////
@@ -82,7 +88,7 @@ const camera = new THREE.PerspectiveCamera(
   0.1,
   1000
 );
-camera.position.z = 100;
+camera.position.z = 80;
 camera.position.y = 5;
 
 const canvas = document.getElementById("threejs");
@@ -103,6 +109,27 @@ window.addEventListener("resize", () => {
 });
 
 const renderloop = () => {
+  planetsMeshes.forEach((planet, index) => {
+    planet.rotation.y += planets[index].speed;
+
+    planet.position.x = Math.sin(planet.rotation.y) * planets[index].distance;
+    planet.position.z = Math.cos(planet.rotation.y) * planets[index].distance;
+
+    planet.children.forEach((child, childIndex) => {
+      if (child.name === "Saturn Ring") {
+        return;
+      }
+
+      child.rotation.y += planets[index].moons[childIndex]?.speed;
+
+      child.position.x =
+        Math.sin(child.rotation.y) * planets[index].moons[childIndex]?.distance;
+
+      child.position.z =
+        Math.cos(child.rotation.y) * planets[index].moons[childIndex]?.distance;
+    });
+  });
+
   controls.update();
   renderer.render(scene, camera);
   window.requestAnimationFrame(renderloop);

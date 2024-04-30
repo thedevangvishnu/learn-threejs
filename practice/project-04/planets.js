@@ -31,6 +31,7 @@ export const planets = [
     name: "Mercury",
     radius: 0.5,
     distance: 10,
+    position: { x: 10, z: 0 },
     speed: 0.01,
     material: mercuryMaterial,
     moons: [],
@@ -39,6 +40,7 @@ export const planets = [
     name: "Venus",
     radius: 0.8,
     distance: 15,
+    position: { x: 15, z: -15 },
     speed: 0.007,
     material: venusMaterial,
     moons: [],
@@ -47,6 +49,7 @@ export const planets = [
     name: "Earth",
     radius: 1,
     distance: 20,
+    position: { x: -20, z: 20 },
     speed: 0.005,
     material: earthMaterial,
     moons: [
@@ -62,6 +65,7 @@ export const planets = [
     name: "Mars",
     radius: 0.7,
     distance: 25,
+    position: { x: 25, z: -25 },
     speed: 0.003,
     material: marsMaterial,
     moons: [
@@ -76,7 +80,6 @@ export const planets = [
         radius: 0.2,
         distance: 3,
         speed: 0.015,
-        color: 0xffffff,
       },
     ],
   },
@@ -84,6 +87,7 @@ export const planets = [
     name: "Jupiter",
     radius: 1.5,
     distance: 32,
+    position: { x: 32, z: 0 },
     speed: 0.002,
     material: jupiterMaterial,
     moons: [
@@ -91,19 +95,19 @@ export const planets = [
         name: "Io",
         radius: 0.1,
         distance: 3,
-        speed: 0.012,
+        speed: 0.0042,
       },
       {
         name: "Europa",
         radius: 0.3,
         distance: 2.2,
-        speed: 0.014,
+        speed: 0.0043,
       },
       {
         name: "Ganymede",
         radius: 0.2,
-        distance: 1.4,
-        speed: 0.01,
+        distance: 1.8,
+        speed: 0.0024,
       },
     ],
   },
@@ -111,7 +115,8 @@ export const planets = [
     name: "Saturn",
     radius: 1,
     distance: 40,
-    speed: 0.001,
+    position: { x: -40, z: -40 },
+    speed: 0.0018,
     material: saturnMaterial,
     moons: [
       {
@@ -132,7 +137,8 @@ export const planets = [
     name: "Uranus",
     radius: 1.1,
     distance: 47,
-    speed: 0.0009,
+    position: { x: 47, z: 40 },
+    speed: 0.0015,
     material: uranusMaterial,
     moons: [
       {
@@ -147,7 +153,9 @@ export const planets = [
     name: "Neptune",
     radius: 1.0,
     distance: 53,
-    speed: 0.0008,
+    position: { x: -53, z: -4 },
+
+    speed: 0.0012,
     material: neptuneMaterial,
     moons: [
       {
