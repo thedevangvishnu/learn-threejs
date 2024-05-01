@@ -22,9 +22,10 @@ export default class Physics {
     });
   }
 
-  add(mesh, type) {
+  add(mesh, type, collider) {
     if (!this.rapierLoaded) return;
 
+    // define rigidBody and related properties
     let rigidBodyType;
     if (type === "dynamic") {
       rigidBodyType = this.rapier.RigidBodyDesc.dynamic();
@@ -40,19 +41,43 @@ export default class Physics {
     this.rigidBody.setTranslation(position);
     this.rigidBody.setRotation(rotation);
 
-    const dimensions = this.computeMeshDimension(mesh);
+    // collider
+    let colliderType;
+    switch (collider) {
+      case "cuboid":
+        const dimensions = this.computeCubeboidDimensions(mesh);
+        colliderType = this.rapier.ColliderDesc.cuboid(
+          dimensions.x / 2,
+          dimensions.y / 2,
+          dimensions.z / 2
+        );
 
-    const colliderType = this.rapier.ColliderDesc.cuboid(
-      dimensions.x / 2,
-      dimensions.y / 2,
-      dimensions.z / 2
-    );
+        break;
+
+      case "ball":
+        const radius = this.computeBallDimensions(mesh);
+        colliderType = this.rapier.ColliderDesc.ball(radius);
+        break;
+
+      case "trimesh":
+        const { scaledVertices, indices } = this.computeTrimeshDimensions(mesh);
+
+        colliderType = this.rapier.ColliderDesc.trimesh(
+          scaledVertices,
+          indices
+        );
+        break;
+      default:
+        break;
+    }
+
     this.world.createCollider(colliderType, this.rigidBody);
 
+    // map mesh to the rigidBody
     this.meshMap.set(mesh, this.rigidBody);
   }
 
-  computeMeshDimension(mesh) {
+  computeCubeboidDimensions(mesh) {
     mesh.geometry.computeBoundingBox();
     let dimensions = mesh.geometry.boundingBox.getSize(new THREE.Vector3());
 
@@ -60,6 +85,32 @@ export default class Physics {
 
     dimensions.multiply(scale);
     return dimensions;
+  }
+
+  computeBallDimensions(mesh) {
+    mesh.geometry.computeBoundingSphere();
+    const radius = mesh.geometry.boundingSphere.radius;
+
+    const scale = mesh.getWorldScale(new THREE.Vector3());
+    const maxScale = Math.max(scale.x, scale.y, scale.z);
+
+    return radius * maxScale;
+  }
+
+  computeTrimeshDimensions(mesh) {
+    const vertices = mesh.geometry.attributes.position.array;
+    const indices = mesh.geometry.index.array;
+
+    const scale = mesh.getWorldScale(new THREE.Vector3());
+
+    const scaledVertices = vertices.map((vertex, index) => {
+      return vertex * scale.getComponent(index % 3);
+    });
+
+    console.log(scale);
+    console.log(scaledVertices);
+
+    return { scaledVertices, indices };
   }
 
   loop() {
