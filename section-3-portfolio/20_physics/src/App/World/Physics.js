@@ -44,11 +44,26 @@ export default class Physics {
     this.rigidBody.setTranslation(mesh.position);
     this.rigidBody.setRotation(mesh.quaternion);
 
-    const colliderType = this.rapier.ColliderDesc.cuboid(0.5, 0.5, 0.5);
+    const dimensions = this.computeMeshDimension(mesh);
+
+    const colliderType = this.rapier.ColliderDesc.cuboid(
+      dimensions.x / 2,
+      dimensions.y / 2,
+      dimensions.z / 2
+    );
     this.world.createCollider(colliderType, this.rigidBody);
 
     this.meshMap.set(mesh, this.rigidBody);
-    console.log(this.meshMap);
+  }
+
+  computeMeshDimension(mesh) {
+    mesh.geometry.computeBoundingBox();
+    let dimensions = mesh.geometry.boundingBox.getSize(new THREE.Vector3());
+
+    const scale = mesh.getWorldScale(new THREE.Vector3());
+
+    dimensions.multiply(scale);
+    return dimensions;
   }
 
   loop() {
