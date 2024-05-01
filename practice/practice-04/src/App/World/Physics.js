@@ -1,52 +1,109 @@
 import * as THREE from "three";
 import App from "../App";
+import { appStateStore } from "../Stores/appStateStore";
 
 export default class Physics {
   constructor() {
     this.app = new App();
 
+    this.meshMap = new Map();
+
     import("@dimforge/rapier3d").then((RPAIER) => {
+      this.rapier = RPAIER;
       const gravity = { x: 0, y: -9.81, z: 0 };
       this.world = new RPAIER.World(gravity);
-      this.loop();
-
-      //   threejs mesh
-      const geometry = new THREE.SphereGeometry(0.8, 32, 32);
-      const material = new THREE.MeshStandardMaterial({
-        color: "red",
-        metalness: 0,
-        roughness: 0.2,
-      });
-      this.sphere = new THREE.Mesh(geometry, material);
-      this.sphere.position.y = 7;
-
-      const groundGeometry = new THREE.BoxGeometry(16, 0.4, 16);
-      const groundMaterial = new THREE.MeshStandardMaterial({
-        color: "gray",
-        metalness: 0,
-        roughness: 0.2,
-      });
-      this.ground = new THREE.Mesh(groundGeometry, groundMaterial);
-
-      this.app.scene.add(this.sphere, this.ground);
-
-      //   rigid body and collider
-      const rigidBodyType = RPAIER.RigidBodyDesc.dynamic();
-      this.rigidBody = this.world.createRigidBody(rigidBodyType);
-      this.rigidBody.setTranslation(this.sphere.position);
-
-      const colliderType = RPAIER.ColliderDesc.ball(0.8);
-      this.world.createCollider(colliderType, this.rigidBody);
-
-      const groundRigidBodyType = RPAIER.RigidBodyDesc.fixed();
-      this.groundRigidBody = this.world.createRigidBody(groundRigidBodyType);
-      this.groundRigidBody.setTranslation(this.ground.position);
-
-      const groundColliderType = RPAIER.ColliderDesc.cuboid(8, 0.2, 8);
-      this.world.createCollider(groundColliderType, this.groundRigidBody);
 
       this.rapierLoaded = true;
+      appStateStore.setState({
+        isRapierLoaded: true,
+      });
     });
+  }
+
+  add(mesh, type, collider) {
+    if (!this.rapierLoaded) return;
+
+    let rigidBodyDesc;
+    if (type === "dynamic") {
+      rigidBodyDesc = this.rapier.RigidBodyDesc.dynamic();
+    } else if (type === "fixed") {
+      rigidBodyDesc = this.rapier.RigidBodyDesc.fixed();
+    }
+    this.rigidBody = this.world.createRigidBody(rigidBodyDesc);
+
+    const position = mesh.getWorldPosition(new THREE.Vector3());
+    const rotation = mesh.getWorldQuaternion(new THREE.Quaternion());
+    this.rigidBody.setTranslation(position);
+    this.rigidBody.setRotation(rotation);
+
+    // autocompute colliderDesc
+    let colliderDesc;
+    switch (collider) {
+      case "cuboid":
+        const dimensions = this.computeCuboidDimensions(mesh);
+        colliderDesc = this.rapier.ColliderDesc.cuboid(
+          dimensions.x / 2,
+          dimensions.y / 2,
+          dimensions.z / 2
+        );
+        break;
+
+      case "ball":
+        const radius = this.computeBallDimensions(mesh);
+        colliderDesc = this.rapier.ColliderDesc.ball(radius);
+        break;
+
+      case "trimesh":
+        const { scaledVertices, indeces } = this.computeTrimeshDimensions(mesh);
+        colliderDesc = this.rapier.ColliderDesc.trimesh(
+          scaledVertices,
+          indeces
+        );
+        break;
+    }
+
+    this.world.createCollider(colliderDesc, this.rigidBody);
+
+    // map the mesh to its rigidbody
+    this.meshMap.set(mesh, this.rigidBody);
+  }
+
+  computeCuboidDimensions(mesh) {
+    mesh.geometry.computeBoundingBox();
+    let dimensions = mesh.geometry.boundingBox.getSize(new THREE.Vector3());
+
+    const scale = mesh.getWorldScale(new THREE.Vector3());
+
+    dimensions.multiply(scale);
+
+    return dimensions;
+  }
+
+  computeBallDimensions(mesh) {
+    mesh.geometry.computeBoundingSphere();
+    const radius = mesh.geometry.boundingSphere.radius;
+
+    const scale = mesh.getWorldScale(new THREE.Vector3());
+    const maxScale = Math.max(scale.x, scale.y, scale.z);
+
+    return radius * maxScale;
+  }
+
+  computeTrimeshDimensions(mesh) {
+    const vertices = mesh.geometry.attributes.position.array;
+    const indeces = mesh.geometry.index.array;
+
+    const scale = mesh.getWorldScale(new THREE.Vector3());
+
+    const scaledVertices = vertices.map((vertex, index) => {
+      return vertex * scale.getComponent(index % 3);
+    });
+
+    console.log(vertices);
+    console.log(scaledVertices);
+    console.log(scale);
+
+    return { scaledVertices, indeces };
   }
 
   loop() {
@@ -54,10 +111,26 @@ export default class Physics {
 
     this.world.step();
 
-    const position = this.rigidBody.translation();
-    const rotation = this.rigidBody.rotation();
+    this.meshMap.forEach((rigidBody, mesh) => {
+      // extracting the position and rotation from the rigid body
+      const position = new THREE.Vector3().copy(rigidBody.translation());
+      const rotation = new THREE.Quaternion().copy(rigidBody.rotation());
 
-    this.sphere.position.copy(position);
-    this.sphere.quaternion.copy(rotation);
+      // transforming the position to the parent mesh's local space
+      position.applyMatrix4(
+        new THREE.Matrix4().copy(mesh.parent.matrixWorld).invert()
+      );
+
+      // transforming the rotation to the parent mesh's local space
+      const inverseParentMatrix = new THREE.Matrix4()
+        .extractRotation(mesh.parent.matrixWorld)
+        .invert();
+      const inverseParentRotation =
+        new THREE.Quaternion().setFromRotationMatrix(inverseParentMatrix);
+      rotation.premultiply(inverseParentRotation);
+
+      mesh.position.copy(position);
+      mesh.quaternion.copy(rotation);
+    });
   }
 }
