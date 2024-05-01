@@ -19,9 +19,9 @@ export default class Camera {
       75,
       this.sizesStore.width / this.sizesStore.height,
       0.1,
-      300
+      500
     );
-    this.instance.position.set(0, 4, 10);
+    this.instance.position.set(0, 4, 15);
     this.app.scene.add(this.instance);
   }
 
