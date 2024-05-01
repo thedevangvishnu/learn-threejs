@@ -17,32 +17,28 @@ export default class Physics {
       const gravity = { x: 0, y: -9.81, z: 0 };
       this.world = new RAPIER.World(gravity);
 
-      const groundGeometry = new THREE.BoxGeometry(20, 0.6, 20);
-      const groundMaterial = new THREE.MeshStandardMaterial({ color: "gray" });
-      this.groundMesh = new THREE.Mesh(groundGeometry, groundMaterial);
-      this.groundMesh.receiveShadow = true;
-      this.scene.add(this.groundMesh);
-
-      //   rapier rigibody
-
-      const groundRigidBodyType = RAPIER.RigidBodyDesc.fixed();
-      this.groundRigidBody = this.world.createRigidBody(groundRigidBodyType);
-
-      const groundCollider = RAPIER.ColliderDesc.cuboid(10, 0.3, 10);
-      this.world.createCollider(groundCollider, this.groundRigidBody);
-
       this.rapierLoaded = true;
       appStateStore.setState({ physicsReady: true });
     });
   }
 
-  add(mesh) {
+  add(mesh, type) {
     if (!this.rapierLoaded) return;
 
-    const rigidBodyType = this.rapier.RigidBodyDesc.dynamic();
+    let rigidBodyType;
+    if (type === "dynamic") {
+      rigidBodyType = this.rapier.RigidBodyDesc.dynamic();
+    } else if (type === "fixed") {
+      rigidBodyType = this.rapier.RigidBodyDesc.fixed();
+    }
+
     this.rigidBody = this.world.createRigidBody(rigidBodyType);
-    this.rigidBody.setTranslation(mesh.position);
-    this.rigidBody.setRotation(mesh.quaternion);
+
+    const position = mesh.getWorldPosition(new THREE.Vector3());
+    const rotation = mesh.getWorldQuaternion(new THREE.Quaternion());
+
+    this.rigidBody.setTranslation(position);
+    this.rigidBody.setRotation(rotation);
 
     const dimensions = this.computeMeshDimension(mesh);
 
@@ -72,8 +68,22 @@ export default class Physics {
     this.world.step();
 
     this.meshMap.forEach((rigidBody, mesh) => {
-      const position = rigidBody.translation();
-      const rotation = rigidBody.rotation();
+      // extracting the position and rotation from the rigid body
+      const position = new THREE.Vector3().copy(rigidBody.translation());
+      const rotation = new THREE.Quaternion().copy(rigidBody.rotation());
+
+      // transforming the position to the parent mesh's local space
+      position.applyMatrix4(
+        new THREE.Matrix4().copy(mesh.parent.matrixWorld).invert()
+      );
+
+      // transforming the rotation to the parent mesh's local space
+      const inverseParentMatrix = new THREE.Matrix4()
+        .extractRotation(mesh.parent.matrixWorld)
+        .invert();
+      const inverseParentRotation =
+        new THREE.Quaternion().setFromRotationMatrix(inverseParentMatrix);
+      rotation.premultiply(inverseParentRotation);
 
       mesh.position.copy(position);
       mesh.quaternion.copy(rotation);
