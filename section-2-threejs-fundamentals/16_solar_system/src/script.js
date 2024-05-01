@@ -125,10 +125,11 @@ const planetsMeshes = planets.map((planet) => {
     planetMesh.add(moonMesh);
   });
 
+  console.log(planetMesh);
   return planetMesh;
 });
 
-console.log(planetsMeshes);
+// console.log(planetsMeshes);
 
 // add light
 const ambientLight = new THREE.AmbientLight("white", 0.2);
