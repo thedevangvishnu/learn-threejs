@@ -42,25 +42,27 @@ export default class Environment {
     });
 
     // mesh and its corresponding phsics
-    this.sphere = new THREE.Mesh(spherGeometry, objectMaterial);
-    this.sphere.scale.set(0.8, 0.8, 0.8);
-    this.group.add(this.sphere);
-    this.physics.add(this.sphere, "dynamic", "ball");
 
-    this.cube = new THREE.Mesh(boxGeometry, objectMaterial);
-    this.cube.position.set(4, 0, 2);
-    this.cube.rotation.x = 0.5;
-    this.group.add(this.cube);
-    this.physics.add(this.cube, "dynamic", "cuboid");
+    for (let i = 0; i < 20; i++) {
+      this.sphere = new THREE.Mesh(spherGeometry, objectMaterial);
 
-    this.torusKnot = new THREE.Mesh(torusKnowGeometry, objectMaterial);
-    this.torusKnot.position.set(-4, 0, 3);
-    this.torusKnot.scale.set(1, 1, 1.4);
-    this.group.add(this.torusKnot);
-    this.physics.add(this.torusKnot, "dynamic", "trimesh");
+      // scale
+      const scaleUnit = (Math.random() + 0.4) * 2;
+      this.sphere.scale.setScalar(scaleUnit);
+
+      // position
+      this.sphere.position.set(
+        Math.random() * 10,
+        (Math.random() + 5) * 10,
+        (Math.random() - 0.5) * 10
+      );
+
+      this.group.add(this.sphere);
+      this.physics.add(this.sphere, "dynamic", "ball");
+    }
 
     this.ground = new THREE.Mesh(boxGeometry, groundMaterial);
-    this.ground.scale.set(16, 0.4, 16);
+    this.ground.scale.set(100, 0.4, 100);
     this.physics.add(this.ground, "fixed", "cuboid");
 
     // add to group/scene
