@@ -37,11 +37,22 @@ export default class Physics {
   add(mesh, type, collider) {
     // defining the rigid body type
     let rigidBodyType;
-    if (type === "dynamic") {
-      rigidBodyType = this.rapier.RigidBodyDesc.dynamic();
-    } else if (type === "fixed") {
-      rigidBodyType = this.rapier.RigidBodyDesc.fixed();
+
+    switch (type) {
+      case "dynamic":
+        rigidBodyType = this.rapier.RigidBodyDesc.dynamic();
+        break;
+      case "fixed":
+        rigidBodyType = this.rapier.RigidBodyDesc.fixed();
+        break;
+      case "kinematicP":
+        rigidBodyType = this.rapier.RigidBodyDesc.kinematicPositionBased();
+        break;
+      case "kinematicV":
+        rigidBodyType = this.rapier.RigidBodyDesc.kinematicVelocityBased();
+        break;
     }
+
     this.rigidBody = this.world.createRigidBody(rigidBodyType);
 
     // defining the collider type
@@ -69,7 +80,6 @@ export default class Physics {
           indices
         );
         this.world.createCollider(colliderType, this.rigidBody);
-
         break;
     }
 
@@ -80,6 +90,7 @@ export default class Physics {
     this.rigidBody.setRotation(worldRotation);
 
     this.meshMap.set(mesh, this.rigidBody);
+    return this.rigidBody;
   }
 
   /**
@@ -133,7 +144,6 @@ Computes the radius of a sphere collider for a given mesh
     if (!this.rapierLoaded) return;
     this.world.step();
     this.meshMap.forEach((rigidBody, mesh) => {
-
       // extracting the position and rotation from the rigid body
       const position = new THREE.Vector3().copy(rigidBody.translation());
       const rotation = new THREE.Quaternion().copy(rigidBody.rotation());
@@ -151,7 +161,6 @@ Computes the radius of a sphere collider for a given mesh
         new THREE.Quaternion().setFromRotationMatrix(inverseParentMatrix);
       rotation.premultiply(inverseParentRotation);
 
-      
       mesh.position.copy(position);
       mesh.quaternion.copy(rotation);
     });
