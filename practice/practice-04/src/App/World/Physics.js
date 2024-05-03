@@ -28,7 +28,12 @@ export default class Physics {
       rigidBodyDesc = this.rapier.RigidBodyDesc.dynamic();
     } else if (type === "fixed") {
       rigidBodyDesc = this.rapier.RigidBodyDesc.fixed();
+    } else if (type === "kinematicV") {
+      rigidBodyDesc = this.rapier.RigidBodyDesc.kinematicVelocityBased();
+    } else if (type === "kinematicP") {
+      rigidBodyDesc = this.rapier.RigidBodyDesc.kinematicPositionBased();
     }
+
     this.rigidBody = this.world.createRigidBody(rigidBodyDesc);
 
     const position = mesh.getWorldPosition(new THREE.Vector3());
@@ -66,6 +71,8 @@ export default class Physics {
 
     // map the mesh to its rigidbody
     this.meshMap.set(mesh, this.rigidBody);
+
+    return this.rigidBody;
   }
 
   computeCuboidDimensions(mesh) {
