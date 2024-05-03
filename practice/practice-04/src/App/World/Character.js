@@ -35,12 +35,12 @@ export default class Character {
   }
 
   loop() {
-    // let { x, y, z } = this.characterRigidBody.translation();
-    // if (this.forward) z -= 0.2;
-    // if (this.backward) z += 0.2;
-    // if (this.left) x -= 0.2;
-    // if (this.right) x += 0.2;
-    // this.characterRigidBody.setNextKinematicTranslation({ x, y, z });
+    let { x, y, z } = this.characterRigidBody.translation();
+    if (this.forward) z -= 0.2;
+    if (this.backward) z += 0.2;
+    if (this.left) x -= 0.2;
+    if (this.right) x += 0.2;
+    this.characterRigidBody.setNextKinematicTranslation({ x, y, z });
   }
 }
 
