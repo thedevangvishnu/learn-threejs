@@ -5,6 +5,7 @@ import Loop from "./Utils/Loop";
 import World from "./World/World";
 import Resize from "./Utils/Resize";
 import AssetLoader from "./Utils/AssetLoader";
+import InputController from "./UI/InputController";
 
 let app = null;
 
@@ -18,6 +19,8 @@ export default class App {
 
     // asset loading and pre-loader
     this.assetLoader = new AssetLoader();
+
+    this.inputController = new InputController();
 
     this.world = new World();
 

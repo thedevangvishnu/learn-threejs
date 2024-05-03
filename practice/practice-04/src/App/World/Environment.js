@@ -20,7 +20,7 @@ export default class Environment {
     this.ambientLight = new THREE.AmbientLight("white", 0.3);
     this.app.scene.add(this.ambientLight);
 
-    this.directionalLight = new THREE.DirectionalLight("white", 1);
+    this.directionalLight = new THREE.DirectionalLight("white", 2);
     this.directionalLight.position.set(3, 4, 5);
     this.app.scene.add(this.directionalLight);
   }
@@ -28,7 +28,7 @@ export default class Environment {
   addBalls() {
     const geometry = new THREE.SphereGeometry(1, 32, 32);
     const material = new THREE.MeshStandardMaterial({
-      color: "#E10032",
+      color: "#F7CB2D",
       metalness: 0,
       roughness: 0.2,
     });

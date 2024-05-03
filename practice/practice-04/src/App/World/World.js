@@ -3,6 +3,7 @@ import App from "../App";
 import Environment from "./Environment";
 import Physics from "./Physics";
 import { appStateStore } from "../Stores/appStateStore";
+import Character from "./Character";
 
 export default class World {
   constructor() {
@@ -12,6 +13,7 @@ export default class World {
     appStateStore.subscribe((state) => {
       if (state.isRapierLoaded) {
         this.environment = new Environment();
+        this.character = new Character();
       }
     });
 
@@ -20,5 +22,6 @@ export default class World {
 
   loop() {
     this.physics.loop();
+    if (this.character) this.character.loop();
   }
 }
