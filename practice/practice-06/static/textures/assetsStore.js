@@ -1,0 +1,5 @@
+const assetsToLoad = [
+  {
+    id: "mars",
+  },
+];
