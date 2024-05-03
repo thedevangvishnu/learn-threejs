@@ -1,6 +1,4 @@
-import * as THREE from "three";
-import { OrbitControls } from "three/addons/controls/OrbitControls.js";
-import { Pane } from "tweakpane";
-import App from "./App/App";
+import './style.css'
+import App from './App/App.js'
 
-const app = new App();
+const app = new App()

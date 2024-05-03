@@ -1,57 +1,60 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
-import App from "./App";
-import { sizesStore } from "./Stores/sizesStore";
+import { sizesStore } from "./Utils/Store.js";
+
+import App from "./App.js";
 
 export default class Camera {
   constructor() {
     this.app = new App();
-    this.sizesStore = sizesStore.getState();
+    this.canvas = this.app.canvas;
+
+    this.sizesStore = sizesStore;
+
+    this.sizes = this.sizesStore.getState();
 
     this.setInstance();
     this.setControls();
-    this.handleResize();
-    this.loop();
+    this.setResizeLister();
   }
 
   setInstance() {
     this.instance = new THREE.PerspectiveCamera(
       35,
-      this.sizesStore.width / this.sizesStore.height,
-      0.1,
-      1000
+      this.sizes.width / this.sizes.height,
+      1,
+      600
     );
-    this.instance.position.set(0, 60, 140);
-    this.app.scene.add(this.instance);
+    this.instance.position.z = 100;
+    this.instance.position.y = 20;
   }
 
   setControls() {
-    this.controls = new OrbitControls(this.instance, this.app.canvas);
+    this.controls = new OrbitControls(this.instance, this.canvas);
     this.controls.enableDamping = true;
   }
 
-  handleResize() {
-    sizesStore.subscribe((state) => {
-      this.instance.aspect = state.width / state.height;
+  setResizeLister() {
+    this.sizesStore.subscribe((sizes) => {
+      this.instance.aspect = sizes.width / sizes.height;
       this.instance.updateProjectionMatrix();
     });
   }
 
   loop() {
     this.controls.update();
-    this.characterControllerRB = this.app.world.characterConroller?.rigidBody;
+    this.characterController = this.app.world.characterController?.rigidBody;
+    if (this.characterController) {
+      const characterPosition = this.characterController.translation();
+      const characterRotation = this.characterController.rotation();
 
-    if (this.characterControllerRB) {
-      const bodyPosition = this.characterControllerRB.translation();
-      const bodyRotation = this.characterControllerRB.rotation();
+      const cameraOffset = new THREE.Vector3(0, 30, 55);
+      cameraOffset.applyQuaternion(characterRotation);
+      cameraOffset.add(characterPosition);
 
-      const cameraOffset = new THREE.Vector3(0, 40, 80);
-      cameraOffset.add(bodyPosition);
-      cameraOffset.applyQuaternion(bodyRotation);
-
-      const targetOffset = new THREE.Vector3(0, 5, 0);
-      targetOffset.add(bodyPosition);
-      targetOffset.applyQuaternion(bodyRotation);
+      const targetOffset = new THREE.Vector3(0, 10, 0);
+      targetOffset.applyQuaternion(characterRotation);
+      targetOffset.add(characterPosition);
 
       this.instance.position.lerp(cameraOffset, 0.1);
       this.controls.target.lerp(targetOffset, 0.1);

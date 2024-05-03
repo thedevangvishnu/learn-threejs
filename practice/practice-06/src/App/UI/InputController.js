@@ -1,61 +1,55 @@
-import App from "../App";
-import { inputsStore } from "../Stores/inputsStore";
+import { inputStore } from "../Utils/Store";
 
 export default class InputController {
   constructor() {
-    this.app = new App();
+    this.startListening();
+    this.inputStore = inputStore;
+  }
 
-    this.keysPressed = {};
-
+  startListening() {
     window.addEventListener("keydown", (event) => this.onKeyDown(event));
     window.addEventListener("keyup", (event) => this.onKeyUp(event));
   }
 
   onKeyDown(event) {
-    if (this.keysPressed[event.code]) return;
-
     switch (event.code) {
       case "KeyW":
       case "ArrowUp":
-        inputsStore.setState({ forward: true });
+        inputStore.setState({ forward: true });
         break;
       case "KeyA":
       case "ArrowLeft":
-        inputsStore.setState({ left: true });
+        inputStore.setState({ left: true });
         break;
       case "KeyS":
       case "ArrowDown":
-        inputsStore.setState({ backward: true });
+        inputStore.setState({ backward: true });
         break;
       case "KeyD":
       case "ArrowRight":
-        inputsStore.setState({ right: true });
+        inputStore.setState({ right: true });
         break;
     }
-
-    this.keysPressed[event.code] = true;
   }
 
   onKeyUp(event) {
     switch (event.code) {
       case "KeyW":
       case "ArrowUp":
-        inputsStore.setState({ forward: false });
+        inputStore.setState({ forward: false });
         break;
       case "KeyA":
       case "ArrowLeft":
-        inputsStore.setState({ left: false });
+        inputStore.setState({ left: false });
         break;
       case "KeyS":
       case "ArrowDown":
-        inputsStore.setState({ backward: false });
+        inputStore.setState({ backward: false });
         break;
       case "KeyD":
       case "ArrowRight":
-        inputsStore.setState({ right: false });
+        inputStore.setState({ right: false });
         break;
     }
-
-    this.keysPressed[event.code] = false;
   }
 }

@@ -1,34 +1,40 @@
-import * as THREE from "three";
-import Camera from "./Camera";
-import Renderer from "./Renderer";
-import Loop from "./Utils/Loop";
-import World from "./World/World";
-import Resize from "./Utils/Resize";
-import AssetLoader from "./Utils/AssetLoader";
-import InputController from "./UI/InputController";
+import * as THREE from 'three'
+import Camera from './Camera.js'
+import Renderer from './Renderer.js'
+import Loop from './Utils/Loop.js'
+import World from './World/World.js'
+import Resize from './Utils/Resize.js'
+import AssetLoader from './Utils/AssetLoader.js'
+import Preloader from './UI/Preloader.js'
+import InputController from './UI/InputController.js'
 
-let app = null;
+let instance = null
 
-export default class App {
-  constructor() {
-    if (app) return app;
-    app = this;
+export default class App{
+    constructor() {
+        if(instance) return instance
+        instance = this
 
-    this.canvas = document.getElementById("threejs");
-    this.scene = new THREE.Scene();
+        // threejs elements
+        this.canvas = document.querySelector("canvas.threejs");
+        this.scene = new THREE.Scene()
 
-    // asset loading and pre-loader
-    this.assetLoader = new AssetLoader();
+        // Asset Loader
+        this.assetLoader = new AssetLoader()
 
-    this.inputController = new InputController();
+        // UI
+        this.preloader = new Preloader()
+        this.inputController = new InputController()
 
-    this.world = new World();
+        // World
+        this.world = new World()
 
-    // camera and renderer
-    this.camera = new Camera();
-    this.renderer = new Renderer();
+        // Camera and Renderer
+        this.camera = new Camera()
+        this.renderer = new Renderer()
 
-    this.resize = new Resize();
-    this.loop = new Loop();
-  }
+        // extra utils
+        this.loop = new Loop()
+        this.resize = new Resize()
+    }
 }

@@ -1,5 +1,6 @@
 import * as THREE from "three";
-import App from "../App";
+
+import App from "../App.js";
 
 export default class Environment {
   constructor() {
@@ -7,113 +8,105 @@ export default class Environment {
     this.scene = this.app.scene;
     this.physics = this.app.world.physics;
 
-    this.setLights();
-    this.addBalls();
+    this.loadEnvironment();
     this.addGround();
-    this.addWalls();
+    // this.addWalls();
     this.addStairs();
-
-    this.scene.background = new THREE.Color("#A2C4E0");
+    this.addMeshes();
   }
 
-  setLights() {
-    this.ambientLight = new THREE.AmbientLight("white", 0.3);
-    this.app.scene.add(this.ambientLight);
+  loadEnvironment() {
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+    this.scene.add(ambientLight);
 
-    this.directionalLight = new THREE.DirectionalLight("white", 2);
-    this.directionalLight.position.set(3, 4, 5);
-    this.app.scene.add(this.directionalLight);
-  }
-
-  addBalls() {
-    const geometry = new THREE.SphereGeometry(1, 32, 32);
-    const material = new THREE.MeshStandardMaterial({
-      color: "#F7CB2D",
-      metalness: 0,
-      roughness: 0.2,
-    });
-
-    // mesh and its corresponding phsics
-    for (let i = 0; i < 100; i++) {
-      this.ball = new THREE.Mesh(geometry, material);
-
-      // scale
-      const scaleUnit = (Math.random() + 0.4) * 1.5;
-      this.ball.scale.setScalar(scaleUnit);
-
-      // position
-      this.ball.position.set(
-        Math.random() * 10,
-        (Math.random() + 5) * 10,
-        (Math.random() - 0.5) * 10
-      );
-
-      this.scene.add(this.ball);
-      this.physics.add(this.ball, "dynamic", "ball");
-    }
+    this.directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
+    this.directionalLight.position.set(1, 1, 1);
+    this.directionalLight.castShadow = true;
+    this.scene.add(this.directionalLight);
   }
 
   addGround() {
-    const geometry = new THREE.BoxGeometry(100, 0.4, 100);
-    const material = new THREE.MeshStandardMaterial({
-      color: "#FCFCFC",
+    const groundGeometry = new THREE.BoxGeometry(100, 1, 100);
+    const groundMaterial = new THREE.MeshStandardMaterial({
+      color: "turquoise",
     });
-
-    this.ground = new THREE.Mesh(geometry, material);
-
-    this.physics.add(this.ground, "fixed", "cuboid");
-    this.app.scene.add(this.ground);
+    this.groundMesh = new THREE.Mesh(groundGeometry, groundMaterial);
+    this.scene.add(this.groundMesh);
+    this.physics.add(this.groundMesh, "fixed", "cuboid");
   }
 
   addWalls() {
-    const geometry = new THREE.BoxGeometry(100, 10, 0.4);
-    const material = new THREE.MeshStandardMaterial({
-      color: "#034687",
+    const wallMaterial = new THREE.MeshStandardMaterial({
+      color: "lightgreen",
     });
 
+    const wallGeometry = new THREE.BoxGeometry(100, 10, 1);
+
     const wallPositions = [
-      { x: 0, y: 4.8, z: -50 },
-      { x: 0, y: 4.8, z: 50 },
-      { x: -50, y: 4.8, z: 0, rotation: { x: 0, y: Math.PI / 2, z: 0 } },
-      { x: 50, y: 4.8, z: 0, rotation: { x: 0, y: Math.PI / 2, z: 0 } },
+      { x: 0, y: 5, z: 50 },
+      { x: 0, y: 5, z: -50 },
+      { x: 50, y: 5, z: 0, rotation: { y: Math.PI / 2 } },
+      { x: -50, y: 5, z: 0, rotation: { y: Math.PI / 2 } },
     ];
 
     wallPositions.forEach((position) => {
-      const wall = new THREE.Mesh(geometry, material);
-      wall.position.set(position.x, position.y, position.z);
-
-      if (position.rotation) {
-        wall.rotation.x = position.rotation.x || 0;
-        wall.rotation.y = position.rotation.y || 0;
-        wall.rotation.z = position.rotation.z || 0;
-      }
-
-      this.scene.add(wall);
-      this.physics.add(wall, "fixed", "cuboid");
+      const wallMesh = new THREE.Mesh(wallGeometry, wallMaterial);
+      wallMesh.position.set(position.x, position.y, position.z);
+      if (position.rotation)
+        wallMesh.rotation.set(
+          position.rotation.x || 0,
+          position.rotation.y || 0,
+          position.rotation.z || 0
+        );
+      this.scene.add(wallMesh);
+      this.physics.add(wallMesh, "fixed", "cuboid");
     });
-
-    // this.wall.rotation.y = Math.PI / 2;
   }
 
   addStairs() {
-    const geometry = new THREE.BoxGeometry(12, 1.5, 99.5);
-    const material = new THREE.MeshStandardMaterial({
-      color: "#151B2F",
+    const stairMaterial = new THREE.MeshStandardMaterial({
+      color: "orange",
     });
 
+    const stairGeometry = new THREE.BoxGeometry(10, 1, 100);
+
     const stairPositions = [
-      { x: 8, y: 1, z: 0 },
-      { x: 20, y: 2.5, z: 0 },
-      { x: 32, y: 4, z: 0 },
-      { x: 44, y: 5.5, z: 0 },
+      { x: 5, y: 1, z: 0 },
+      { x: 15, y: 2, z: 0 },
+      { x: 25, y: 3, z: 0 },
+      { x: 35, y: 4, z: 0 },
+      { x: 45, y: 5, z: 0 },
     ];
 
     stairPositions.forEach((position) => {
-      const stair = new THREE.Mesh(geometry, material);
-      stair.position.set(position.x, position.y, position.z);
-
-      this.scene.add(stair);
-      this.physics.add(stair, "fixed", "cuboid");
+      const stairMesh = new THREE.Mesh(stairGeometry, stairMaterial);
+      stairMesh.position.set(position.x, position.y, position.z);
+      this.scene.add(stairMesh);
+      this.physics.add(stairMesh, "fixed", "cuboid");
     });
+  }
+
+  addMeshes() {
+    const geometry = new THREE.SphereGeometry(1, 32, 32);
+    const material = new THREE.MeshStandardMaterial({
+      color: "blue",
+    });
+
+    for (let i = 0; i < 100; i++) {
+      const mesh = new THREE.Mesh(geometry, material);
+      mesh.position.set(
+        (Math.random() - 0.5) * 10,
+        (Math.random() + 5) * 10,
+        (Math.random() - 0.5) * 10
+      );
+      mesh.scale.setScalar(Math.random() + 0.5);
+      mesh.rotation.set(
+        Math.random() * Math.PI,
+        Math.random() * Math.PI,
+        Math.random() * Math.PI
+      );
+      this.scene.add(mesh);
+      this.physics.add(mesh, "dynamic", "ball");
+    }
   }
 }

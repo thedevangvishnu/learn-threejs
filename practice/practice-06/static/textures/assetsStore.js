@@ -1,5 +1,0 @@
-const assetsToLoad = [
-  {
-    id: "mars",
-  },
-];

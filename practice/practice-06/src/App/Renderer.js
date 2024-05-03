@@ -1,35 +1,38 @@
 import * as THREE from "three";
-import App from "./App";
-import { sizesStore } from "./Stores/sizesStore";
+import App from "./App.js";
+import { sizesStore } from "./Utils/Store.js";
 
 export default class Renderer {
   constructor() {
     this.app = new App();
-    this.sizesStore = sizesStore.getState();
+    this.canvas = this.app.canvas;
+    this.camera = this.app.camera;
+    this.scene = this.app.scene;
+    this.sizesStore = sizesStore;
+    this.sizes = this.sizesStore.getState();
 
     this.setInstance();
-    this.handleResize();
-    this.loop();
+    this.setResizeLister();
   }
 
   setInstance() {
     this.instance = new THREE.WebGLRenderer({
-      canvas: this.app.canvas,
+      canvas: this.canvas,
       antialias: true,
     });
-
-    this.instance.setSize(this.sizesStore.width, this.sizesStore.height);
-    this.instance.setPixelRatio(this.sizesStore.pixelRatio);
+    this.instance.setSize(this.sizes.width, this.sizes.height);
+    this.instance.setPixelRatio(this.sizes.pixelRatio);
+    this.instance.outputEncoding = THREE.sRGBEncoding;
   }
 
-  handleResize() {
-    sizesStore.subscribe((state) => {
-      this.instance.setSize(state.width, state.height);
-      this.instance.setPixelRatio(state.pixelRatio);
+  setResizeLister() {
+    this.sizesStore.subscribe((sizes) => {
+      this.instance.setSize(sizes.width, sizes.height);
+      this.instance.setPixelRatio(sizes.pixelRatio);
     });
   }
 
   loop() {
-    this.instance.render(this.app.scene, this.app.camera.instance);
+    this.instance.render(this.scene, this.camera.instance);
   }
 }

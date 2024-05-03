@@ -1,17 +1,18 @@
-import { sizesStore } from "../Stores/sizesStore";
+import { sizesStore } from "./Store";
 
 export default class Resize {
-  constructor() {
-    this.setResize();
-  }
+    constructor() {
 
-  setResize() {
-    window.addEventListener("resize", () => {
-      sizesStore.setState({
-        width: window.innerWidth,
-        height: window.innerHeight,
-        pixelRatio: Math.min(window.devicePixelRatio, 2),
-      });
-    });
-  }
+        const { setState } = sizesStore
+
+        window.addEventListener("resize", () => {
+            setState({
+                width: window.innerWidth,
+                height: window.innerHeight,
+                pixelRatio: Math.min(window.devicePixelRatio, 2),
+            })
+          
+          });
+
+    }
 }
