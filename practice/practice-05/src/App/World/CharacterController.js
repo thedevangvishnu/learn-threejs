@@ -48,7 +48,7 @@ export default class CharacterController {
     this.characterController.enableSnapToGround(0.5);
   }
 
-  loop() {
+  loop(deltaTime) {
     const movement = new THREE.Vector3();
 
     if (this.forward) movement.z -= 1;
@@ -56,7 +56,7 @@ export default class CharacterController {
     if (this.left) movement.x -= 1;
     if (this.right) movement.x += 1;
 
-    movement.normalize().multiplyScalar(0.4);
+    movement.normalize().multiplyScalar(deltaTime * 20);
     movement.y = -1;
 
     this.characterController.computeColliderMovement(this.collider, movement);
